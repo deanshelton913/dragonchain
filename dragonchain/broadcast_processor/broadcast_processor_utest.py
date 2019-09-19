@@ -72,6 +72,23 @@ class BroadcastProcessorTests(unittest.TestCase):
         self.assertEqual(broadcast_processor.chain_id_set_from_matchmaking_claim(fake_claim, 4), {"test4"})
         self.assertEqual(broadcast_processor.chain_id_set_from_matchmaking_claim(fake_claim, 5), {"test5"})
 
+    def test_get_level_from_storage_location_returns_level_string(self):
+        level = broadcast_processor.get_level_from_storage_location("/BLOCK/something-l3-asdfsdf")
+        self.assertEqual(level, "3")
+
+    def test_get_level_from_storage_location_returns_none_when_fails(self):
+        level = broadcast_processor.get_level_from_storage_location("/BLOCK/something-apples-asdfsdf")
+        self.assertEqual(level, None)
+
+    def test_notification_urls_returns_set(self):
+        urls = broadcast_processor.get_notification_urls("banana")
+        self.assertEqual(type(urls), set)
+
+    @patch.dict("dragonchain.broadcast_processor.broadcast_processor.VERIFICATION_NOTIFICATION", {"all": ["url1"]})
+    def test_notification_urls_returns_values_from_env(self):
+        urls = broadcast_processor.get_notification_urls("all")
+        self.assertEqual(urls, {"url1"})
+
     @patch("dragonchain.broadcast_processor.broadcast_processor.block_dao.get_broadcast_dto")
     def test_broadcast_futures_gets_broadcast_dto_for_block_id(self, patch_get_broadcast):
         broadcast_processor.make_broadcast_futures(None, "id", 3, set())

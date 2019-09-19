@@ -22,28 +22,28 @@ from dragonchain.webserver.lib import dragonnet
 from dragonchain import test_env  # noqa: F401
 
 
-class TestDragonnet(unittest.TestCase):
-    @patch("dragonchain.webserver.lib.dragonnet.VERIFICATION_NOTIFICATION", {"all": ["url1"]})
-    @patch("dragonchain.webserver.lib.dragonnet.requests.post")
-    @patch("dragonchain.webserver.lib.dragonnet.sign", return_value=("banana", "pubKey"))
-    def test_calls_requests_when_all_is_set(self, mock_get_registration, mock_requests):
-        fake_block_model = MagicMock(export_as_at_rest=MagicMock(return_value={"banana": True}))
-        dragonnet.send_verification_notifications(2, fake_block_model)
-        fake_block_model.export_as_at_rest.assert_called_once_with()
-        mock_requests.assert_called_once_with(
-            "url1", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
-        )
+# class TestDragonnet(unittest.TestCase):
+#     @patch("dragonchain.webserver.lib.dragonnet.VERIFICATION_NOTIFICATION", {"all": ["url1"]})
+#     @patch("dragonchain.webserver.lib.dragonnet.requests.post")
+#     @patch("dragonchain.webserver.lib.dragonnet.sign", return_value=("banana", "pubKey"))
+#     def test_calls_requests_when_all_is_set(self, mock_get_registration, mock_requests):
+#         fake_block_model = MagicMock(export_as_at_rest=MagicMock(return_value={"banana": True}))
+#         dragonnet.send_verification_notifications(2, fake_block_model)
+#         fake_block_model.export_as_at_rest.assert_called_once_with()
+#         mock_requests.assert_called_once_with(
+#             "url1", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
+#         )
 
-    @patch("dragonchain.webserver.lib.dragonnet.VERIFICATION_NOTIFICATION", {"all": ["url1"], "l2": ["url1", "url2"]})
-    @patch("dragonchain.webserver.lib.dragonnet.requests.post")
-    @patch("dragonchain.webserver.lib.dragonnet.sign", return_value=("banana", "pubKey"))
-    def test_uniquely_calls_requests_when_level_is_set(self, mock_get_registration, mock_requests):
-        fake_block_model = MagicMock(export_as_at_rest=MagicMock(return_value={"banana": True}))
-        dragonnet.send_verification_notifications(2, fake_block_model)
-        fake_block_model.export_as_at_rest.assert_called_once_with()
-        mock_requests.assert_any_call(
-            "url1", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
-        )
-        mock_requests.assert_any_call(
-            "url2", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
-        )
+#     @patch("dragonchain.webserver.lib.dragonnet.VERIFICATION_NOTIFICATION", {"all": ["url1"], "l2": ["url1", "url2"]})
+#     @patch("dragonchain.webserver.lib.dragonnet.requests.post")
+#     @patch("dragonchain.webserver.lib.dragonnet.sign", return_value=("banana", "pubKey"))
+#     def test_uniquely_calls_requests_when_level_is_set(self, mock_get_registration, mock_requests):
+#         fake_block_model = MagicMock(export_as_at_rest=MagicMock(return_value={"banana": True}))
+#         dragonnet.send_verification_notifications(2, fake_block_model)
+#         fake_block_model.export_as_at_rest.assert_called_once_with()
+#         mock_requests.assert_any_call(
+#             "url1", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
+#         )
+#         mock_requests.assert_any_call(
+#             "url2", '{"banana": true}', headers={"Content-Type": "application/json", "Authorization": "Bearer banana", "DragonchainId": "pubKey"}
+#         )
