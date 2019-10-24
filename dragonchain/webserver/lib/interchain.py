@@ -140,6 +140,19 @@ def sign_interchain_transaction_v1(blockchain: str, name: str, transaction: Dict
     return {"signed": client.sign_transaction(transaction)}
 
 
+def publish_interchain_transaction_v1(blockchain: str, name: str, transaction: Dict[str, Any]) -> Dict[str, str]:
+    client = interchain_dao.get_interchain_client(blockchain, name)
+    # Delete the user provided version field before passing it to sign transaction
+    try:
+        del transaction["version"]
+    except KeyError:  # If the key doesn't exist, that is fine
+        pass
+    signed_transaction = client.sign_transaction(transaction)
+    transaction_hash = client.publish_transaction(signed_transaction)
+
+    return {"hash": transaction_hash}
+
+
 # Below methods are deprecated and exist for legacy support only. Both methods will return a 404 if not a legacy chain
 
 

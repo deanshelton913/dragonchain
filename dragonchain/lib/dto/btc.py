@@ -266,6 +266,15 @@ class BitcoinNetwork(model.InterchainModel):
         # Send signed transaction
         return self._call("sendrawtransaction", signed_transaction)
 
+    def publish_transaction(self, signed_transaction: str) -> str:
+        """Publish a transaction to this network with a certain data payload
+        Args:
+            signed_transaction: The arbitrary data to send with this transaction
+        Returns:
+            The string of the published transaction hash
+        """
+        return self._call("sendrawtransaction", signed_transaction)
+
     def _calculate_transaction_fee(self) -> int:
         """Get the current satoshi/byte fee estimate
         Returns:

@@ -64,6 +64,15 @@ class InterchainModel(Model):
         """
         raise NotImplementedError("This is an abstract method")
 
+    def publish_transaction(self, signed_transaction: str) -> str:
+        """Publish a transaction to this network
+        Args:
+            signed_transaction: The signed transaction to broadcast to this public chain
+        Returns:
+            The hex string of the published transaction hash
+        """
+        raise NotImplementedError("This is an abstract method")
+
     def publish_l5_hash_to_public_network(self, l5_block_hash: str) -> str:
         """Publish an l5 block hash to this network
         Args:

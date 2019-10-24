@@ -136,6 +136,19 @@ def create_bitcoin_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]:
 
 
 @request_authorizer.Authenticated()
+def publish_bitcoin_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]:
+    if not flask.request.is_json:
+        raise exceptions.BadRequest("Could not parse JSON")
+    data = flask.request.json
+    try:
+        _validate_bitcoin_transaction_v1(data)
+    except fastjsonschema.JsonSchemaException as e:
+        raise exceptions.ValidationException(str(e))
+
+    return helpers.flask_http_response(200, interchain.publish_interchain_transaction_v1("bitcoin", name, data))
+
+
+@request_authorizer.Authenticated()
 def create_ethereum_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]:
     if not flask.request.is_json:
         raise exceptions.BadRequest("Could not parse JSON")
@@ -146,6 +159,19 @@ def create_ethereum_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]
         raise exceptions.ValidationException(str(e))
 
     return helpers.flask_http_response(200, interchain.sign_interchain_transaction_v1("ethereum", name, data))
+
+
+@request_authorizer.Authenticated()
+def publish_ethereum_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]:
+    if not flask.request.is_json:
+        raise exceptions.BadRequest("Could not parse JSON")
+    data = flask.request.json
+    try:
+        _validate_ethereum_transaction_v1(data)
+    except fastjsonschema.JsonSchemaException as e:
+        raise exceptions.ValidationException(str(e))
+
+    return helpers.flask_http_response(200, interchain.publish_interchain_transaction_v1("ethereum", name, data))
 
 
 @request_authorizer.Authenticated()

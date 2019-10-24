@@ -238,6 +238,15 @@ class EthereumNetwork(model.InterchainModel):
         """
         return base64.b64encode(self.priv_key.to_bytes()).decode("ascii")
 
+    def publish_transaction(self, signed_transaction):
+        """Publish a transaction to this network
+        Args:
+            signed_transaction: The signed transaction to broadcast to this public chain
+        Returns:
+            The hex string of the published transaction hash
+        """
+        return self.w3.toHex(self.w3.eth.sendRawTransaction(signed_transaction))
+
     def _publish_transaction(self, transaction_payload: str) -> str:
         """Publish a transaction to this network with a certain data payload
         Args:
