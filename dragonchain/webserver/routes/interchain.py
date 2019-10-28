@@ -32,10 +32,12 @@ LEVEL = os.environ["LEVEL"]
 _validate_bitcoin_network_create_v1 = fastjsonschema.compile(schema.create_bitcoin_interchain_schema_v1)
 _validate_bitcoin_network_update_v1 = fastjsonschema.compile(schema.update_bitcoin_interchain_schema_v1)
 _validate_bitcoin_transaction_v1 = fastjsonschema.compile(schema.btc_transaction_schema_v1)
+_validate_bitcoin_publish_transaction_v1 = fastjsonschema.compile(schema.btc_publish_transaction_schema_v1)
 
 _validate_ethereum_network_create_v1 = fastjsonschema.compile(schema.create_ethereum_interchain_schema_v1)
 _validate_ethereum_network_update_v1 = fastjsonschema.compile(schema.update_ethereum_interchain_schema_v1)
 _validate_ethereum_transaction_v1 = fastjsonschema.compile(schema.eth_transaction_schema_v1)
+_validate_publish_ethereum_transaction_v1 = fastjsonschema.compile(schema.eth_publish_transaction_schema_v1)
 
 _validate_set_default_interchain_v1 = fastjsonschema.compile(schema.set_default_interchain_schema_v1)
 
@@ -51,6 +53,13 @@ def apply_routes(app: flask.Flask):
     app.add_url_rule("/v1/interchains/bitcoin/<name>/transaction", "create_bitcoin_transaction_v1", create_bitcoin_transaction_v1, methods=["POST"])
     app.add_url_rule(
         "/v1/interchains/ethereum/<name>/transaction", "create_ethereum_transaction_v1", create_ethereum_transaction_v1, methods=["POST"]
+    )
+    # Create Interchain Transaction
+    app.add_url_rule(
+        "/v1/interchains/bitcoin/<name>/transaction/publish", "publish_bitcoin_transaction_v1", publish_bitcoin_transaction_v1, methods=["POST"]
+    )
+    app.add_url_rule(
+        "/v1/interchains/ethereum/<name>/transaction/publish", "publish_ethereum_transaction_v1", publish_ethereum_transaction_v1, methods=["POST"]
     )
     # List
     app.add_url_rule("/v1/interchains/<blockchain>", "list_interchains_v1", list_interchains_v1, methods=["GET"])
@@ -141,7 +150,7 @@ def publish_bitcoin_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]]
         raise exceptions.BadRequest("Could not parse JSON")
     data = flask.request.json
     try:
-        _validate_bitcoin_transaction_v1(data)
+        _validate_bitcoin_publish_transaction_v1(data)
     except fastjsonschema.JsonSchemaException as e:
         raise exceptions.ValidationException(str(e))
 
@@ -167,7 +176,7 @@ def publish_ethereum_transaction_v1(name: str) -> Tuple[str, int, Dict[str, str]
         raise exceptions.BadRequest("Could not parse JSON")
     data = flask.request.json
     try:
-        _validate_ethereum_transaction_v1(data)
+        _validate_publish_ethereum_transaction_v1(data)
     except fastjsonschema.JsonSchemaException as e:
         raise exceptions.ValidationException(str(e))
 

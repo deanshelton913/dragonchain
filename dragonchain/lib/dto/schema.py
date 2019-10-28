@@ -606,6 +606,13 @@ update_bitcoin_interchain_schema_v1 = {
 }
 
 
+btc_publish_transaction_schema_v1 = {
+    "type": "object",
+    "properties": {"transaction": {"type": "string", "pattern": "0[xX][0-9a-fA-F]+"}},
+    "required": ["transaction"],
+    "additionalProperties": False,
+}
+
 btc_transaction_schema_v1 = {
     "type": "object",
     "properties": {
@@ -667,5 +674,13 @@ eth_transaction_schema_v1 = {
         "nonce": {"type": "string"},
     },
     "required": ["to", "value"],
+    "additionalProperties": False,
+}
+
+
+eth_publish_transaction_schema_v1 = {
+    "type": "object",
+    "properties": {"transaction": {"type": "string", "pattern": "0[xX][0-9a-fA-F]+"}},
+    "required": ["transaction"],
     "additionalProperties": False,
 }
