@@ -169,8 +169,8 @@ class BinanceNetwork(model.InterchainModel):
             exceptions.TransactionNotFound: When the transaction could not be found (may have been dropped)
         """
         _log.info(f"[BINANCE] Getting confirmations for {transaction_hash}")
-        transaction_hash = f"0x{transaction_hash}"  # FYI: RPC needs this prepended
         try:
+            transaction_hash = base64.b64encode(bytes.fromhex(transaction_hash)).decode("utf-8")
             response = self._call_node_rpc("tx", {"hash": transaction_hash, "prove": True})
             transaction_block_number = int(response["result"]["height"])
         except exceptions.InterchainConnectionError:
@@ -264,15 +264,15 @@ class BinanceNetwork(model.InterchainModel):
 
     def _build_transaction_msg(self, account_response: Dict[str, Any], transaction_payload: str) -> Dict:
         # easier to just use from-addy for the to-addy than create a properly formatted dummy addy
-        inputs = {"address": self.address, "coins": [{"amount": 0, "denom": "BNB"}]}
-        outputs = {"address": self.address, "coins": [{"amount": 0, "denom": "BNB"}]}
+        inputs = {"address": self.address, "coins": [{"amount": 1, "denom": "BNB"}]}
+        outputs = {"address": self.address, "coins": [{"amount": 1, "denom": "BNB"}]}
         response = self._fetch_account()
 
         transaction_data = {
             "account_number": response["account_number"],
             "sequence": response["sequence"],
             "from": self.address,
-            "memo": transaction_payload.encode("utf-8"),
+            "memo": transaction_payload,
             "msgs": [{"type": "cosmos-sdk/Send", "inputs": [inputs], "outputs": [outputs]}],
         }
         return transaction_data
@@ -304,7 +304,7 @@ class BinanceNetwork(model.InterchainModel):
             signature = base64.b64decode(mykeys.make_binance_signature(content=tx.signing_json()))
             tx.apply_sig(signature, self.wallet.public_key)
             signed_transaction_bytes = tx.encode()
-            return signed_transaction_bytes.hex()
+            return base64.b64encode(signed_transaction_bytes).decode("utf-8")
         except Exception as e:
             raise exceptions.BadRequest(f"Error signing transaction: {e}")
 
@@ -320,7 +320,7 @@ class BinanceNetwork(model.InterchainModel):
         built_tx = self._build_transaction_msg(self._fetch_account(), transaction_payload)
         signed_tx = self.sign_transaction(built_tx)
         _log.info(f"[BINANCE] Sending signed transaction: {signed_tx}")
-        response = self._call_node_rpc("broadcast_tx_commit", {"tx": "0x" + signed_tx})
+        response = self._call_node_rpc("broadcast_tx_commit", {"tx": signed_tx})
         return response["result"]["hash"]  # transaction hash
 
     # endpoints currently hit are:
